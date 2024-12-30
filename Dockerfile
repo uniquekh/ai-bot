@@ -1,17 +1,10 @@
-# Use an official Python runtime as a parent image
-FROM python:3.9-slim
+FROM python:3.9-slim-buster
 
-# Set the working directory
 WORKDIR /app
 
-# Copy app files
-COPY . .
-
-# Install dependencies
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose the port (if needed for debugging)
-EXPOSE 8000
+COPY app.py .
 
-# Run the bot
-CMD ["python", "main.py"]
+CMD ["flask", "run", "--host", "0.0.0.0", "--port", "5000"]
