@@ -1,62 +1,36 @@
 from pyrogram import Client, filters
-import openai
-from tts import text_to_speech
-from config import TELEGRAM_BOT_TOKEN, OPENAI_API_KEY
+import google.generativeai as genai
 
-# OpenAI and Pyrogram initialization
-openai.api_key = OPENAI_API_KEY
-app = Client(
-    "chatgpt_bot", 
-    api_id = 21179966 ,
-    api_hash= 'd97919fb0a3c725e8bb2a25bbb37d57c',
-    bot_token=TELEGRAM_BOT_TOKEN,
-)
+# Replace with your actual API keys
+API_ID = "21179966"
+API_HASH = "d97919fb0a3c725e8bb2a25bbb37d57c"
+BOT_TOKEN = "7257652625:AAEk7gVuGUYmjGAMFl1ZXFkzUjZLM5hbcI8"  # Replace with your group's chat ID (negative value)  # Replace with your Telegram user ID (obtainable from @get_my_id bot)
+GEMINI_API_KEY = "AIzaSyACejlDYl4Szlj1t2f-4ep4RO0yK0r-8wU"
 
-# Dictionary to store conversation context
-user_context = {}
+# Initialize Pyrogram client
+app = Client("my_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
-@app.on_message(filters.private & ~filters.command(["start", "clear"]))
-async def handle_message(client, message):
-    user_id = message.from_user.id
+# Initialize Google's Gemini client for text generation
+genai.configure(api_key=GEMINI_API_KEY)
+model = genai.GenerativeModel('gemini-1.5-flash')
+
+# No filters used here (handles all messages)
+@app.on_message(filters.text & ~filters.command(["start", "help"]))
+async def echo_message(client, message):
     user_input = message.text
 
-    # Maintain conversation history for the user
-    if user_id not in user_context:
-        user_context[user_id] = []
-
-    user_context[user_id].append({"role": "user", "content": user_input})
-
     try:
-        # Generate response using OpenAI
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=user_context[user_id]
-        )
-        reply = response['choices'][0]['message']['content'].strip()
-
-        # Add bot reply to context
-        user_context[user_id].append({"role": "assistant", "content": reply})
-
-        # Send the reply
-        await message.reply(reply)
-
-        # Optionally send a voice message
-        audio_file = text_to_speech(reply)
-        if audio_file:
-            await message.reply_voice(audio_file)
-
+        response = model.generate_content(user_input)
+        await message.reply(response.text)
     except Exception as e:
-        await message.reply("An error occurred while processing your request.")
+        await message.reply(f"An error occurred: {str(e)}")
 
 @app.on_message(filters.command("start"))
 async def start(client, message):
-    await message.reply("Hello! I'm your AI assistant. You can start chatting with me.")
+    await message.reply("Hello! I'm your Gemini-powered AI assistant. Ask me anything.")
 
-@app.on_message(filters.command("clear"))
-async def clear(client, message):
-    user_id = message.from_user.id
-    user_context.pop(user_id, None)
-    await message.reply("Context cleared! Let's start a new conversation.")
-
-if __name__ == "__main__":
-    app.run()
+@app.on_message(filters.command("help"))
+async def help(client, message):
+    await message.reply("Available commands:\n/start - Start the bot\n/help - Show this help message")
+print("Bot started!")
+app.run()
