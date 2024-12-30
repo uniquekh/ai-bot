@@ -6,7 +6,9 @@ from app.config import TELEGRAM_BOT_TOKEN, OPENAI_API_KEY
 # OpenAI and Pyrogram initialization
 openai.api_key = OPENAI_API_KEY
 app = Client(
-    "chatgpt_bot",
+    "chatgpt_bot", 
+    api_id = 21179966 ,
+    api_hash= 'd97919fb0a3c725e8bb2a25bbb37d57c',
     bot_token=TELEGRAM_BOT_TOKEN,
 )
 
