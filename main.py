@@ -27,7 +27,7 @@ async def echo_message(client, message):
 
 @app.on_message(filters.command("start"))
 async def start(client, message):
-    await message.reply("Hello! I'm your Gemini-powered AI assistant. Ask me anything.")
+    await message.reply("Hello! I'm your AI assistant. Ask me anything.")
 
 @app.on_message(filters.command("help"))
 async def help(client, message):
