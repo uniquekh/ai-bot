@@ -1,7 +1,7 @@
 from pyrogram import Client, filters
 import openai
-from app.tts import text_to_speech
-from app.config import TELEGRAM_BOT_TOKEN, OPENAI_API_KEY
+from tts import text_to_speech
+from config import TELEGRAM_BOT_TOKEN, OPENAI_API_KEY
 
 # OpenAI and Pyrogram initialization
 openai.api_key = OPENAI_API_KEY
